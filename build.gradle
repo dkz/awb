@@ -1,0 +1,26 @@
+plugins {
+  id 'idea'
+  id 'org.springframework.boot' version '2.6.3'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+  id 'java'
+}
+
+group = 'su.dkzde'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+  compileOnly 'org.springframework.boot:spring-boot-devtools'
+  implementation 'org.springframework.boot:spring-boot-starter'
+  implementation 'org.javacord:javacord:3.4.0'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+  useJUnitPlatform()
+}
