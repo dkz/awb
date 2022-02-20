@@ -1,0 +1,136 @@
+package su.dkzde.awb.fc.client;
+
+import org.springframework.lang.Nullable;
+
+import java.net.URI;
+import java.time.Instant;
+import java.util.*;
+
+public class Thread {
+
+    private final Board board;
+
+    private final long number;
+    private final @Nullable String subject;
+    private final Post op;
+
+    private final boolean sticky;
+    private final boolean closed;
+
+    private final int uniqueIps;
+
+    private final boolean bumpLimitReached;
+    private final boolean imageLimitReached;
+    private final @Nullable Instant archived;
+
+    private final List<Post> replies;
+    private final Map<Long, Post> index;
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private Board board;
+        private URI location;
+        private Long number;
+        private @Nullable String subject;
+        private Post op;
+        private Boolean sticky;
+        private Boolean closed;
+        private Integer uniqueIps;
+        private Boolean bumpLimitReached;
+        private Boolean imageLimitReached;
+        private @Nullable Instant archived;
+        private final ArrayList<Post> replies = new ArrayList<>();
+        private final HashMap<Long, Post> index = new HashMap<>();
+        private Builder() {}
+        public Builder setBoard(Board board) {
+            this.board = board;
+            return this;
+        }
+        public Builder setNumber(long number) {
+            this.number = number;
+            return this;
+        }
+        public Builder setSubject(String subject) {
+            this.subject = subject;
+            return this;
+        }
+        public Builder setOp(Post op) {
+            this.op = op;
+            return this;
+        }
+        public Builder setSticky(boolean sticky) {
+            this.sticky = sticky;
+            return this;
+        }
+        public Builder setClosed(boolean closed) {
+            this.closed = closed;
+            return this;
+        }
+        public Builder setUniqueIds(int uniqueIps) {
+            this.uniqueIps = uniqueIps;
+            return this;
+        }
+        public Builder setBumpLimitReached(boolean bumpLimitReached) {
+            this.bumpLimitReached = bumpLimitReached;
+            return this;
+        }
+        public Builder setImageLimitReached(boolean imageLimitReached) {
+            this.imageLimitReached = imageLimitReached;
+            return this;
+        }
+        public Builder setArchived(Instant archived) {
+            this.archived = archived;
+            return this;
+        }
+        public Builder addReply(Post post) {
+            replies.add(post);
+            return this;
+        }
+        public Thread build() {
+            return new Thread(
+                    Objects.requireNonNull(board),
+                    Objects.requireNonNull(number),
+                    subject,
+                    Objects.requireNonNull(op),
+                    Objects.requireNonNull(sticky),
+                    Objects.requireNonNull(closed),
+                    Objects.requireNonNull(uniqueIps),
+                    Objects.requireNonNull(bumpLimitReached),
+                    Objects.requireNonNull(imageLimitReached),
+                    archived,
+                    List.copyOf(replies),
+                    Map.copyOf(index));
+        }
+    }
+
+    private Thread(
+            Board board,
+            long number,
+            @Nullable String subject,
+            Post op,
+            boolean sticky,
+            boolean closed,
+            int uniqueIps,
+            boolean bumpLimitReached,
+            boolean imageLimitReached,
+            @Nullable Instant archived,
+            List<Post> replies,
+            Map<Long, Post> index) {
+
+        this.board = board;
+        this.number = number;
+        this.subject = subject;
+        this.op = op;
+        this.sticky = sticky;
+        this.closed = closed;
+        this.uniqueIps = uniqueIps;
+        this.bumpLimitReached = bumpLimitReached;
+        this.imageLimitReached = imageLimitReached;
+        this.archived = archived;
+        this.replies = replies;
+        this.index = index;
+    }
+}
