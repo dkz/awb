@@ -6,7 +6,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.*;
 
-public class Thread {
+public final class Thread {
 
     private final Board board;
 

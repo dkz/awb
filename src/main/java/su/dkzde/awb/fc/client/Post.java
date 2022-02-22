@@ -15,7 +15,7 @@ public final class Post {
     public static final class Builder {
         private Long number;
         private Instant posted;
-        private String comment;
+        private @Nullable String comment;
         private @Nullable CaptionCode caption;
         private @Nullable Attachment attachment;
         private Builder() {}
@@ -27,7 +27,7 @@ public final class Post {
             this.posted = posted;
             return this;
         }
-        public Builder setComment(String comment) {
+        public Builder setComment(@Nullable String comment) {
             this.comment = comment;
             return this;
         }
@@ -43,7 +43,7 @@ public final class Post {
             return new Post(
                     Objects.requireNonNull(number),
                     Objects.requireNonNull(posted),
-                    Objects.requireNonNull(comment),
+                    comment,
                     caption,
                     attachment);
         }
@@ -51,7 +51,7 @@ public final class Post {
 
     private final long number;
     private final Instant posted;
-    private final String comment;
+    private final @Nullable String comment;
     private final @Nullable CaptionCode caption;
     private final @Nullable Attachment attachment;
 
@@ -63,8 +63,8 @@ public final class Post {
         return posted;
     }
 
-    public String comment() {
-        return comment;
+    public Optional<String> comment() {
+        return Optional.ofNullable(comment);
     }
 
     public Optional<CaptionCode> caption() {
@@ -78,7 +78,7 @@ public final class Post {
     private Post(
             long number,
             Instant posted,
-            String comment,
+            @Nullable String comment,
             @Nullable CaptionCode caption,
             @Nullable Attachment attachment) {
 

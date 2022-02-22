@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @SpringBootApplication
 public class AwbApplication {
@@ -27,5 +28,10 @@ public class AwbApplication {
                 .setAllNonPrivilegedIntents()
                 .login()
                 .join();
+    }
+
+    @Bean
+    public WebClient web() {
+        return WebClient.create();
     }
 }
