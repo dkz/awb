@@ -1,16 +1,36 @@
 package su.dkzde.awb.fc.client;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.util.annotation.Nullable;
 
 import java.net.URI;
+import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum Board {
 
+    @JsonProperty("vt")
     vt {
         @Override
-        public Pattern pattern() {
-            return Pattern.compile("\\bhttps://boards.(4channel|4chan).org/vt/thread/(?<thread>\\d+)(?:#p(?<post>\\d+))?\\b");
+        public Optional<Link> parseLink(String text) {
+            Matcher matcher = pattern.matcher(text);
+            if (!matcher.find()) {
+                return Optional.empty();
+            } else {
+                String tid = matcher.group("thread");
+                String pid = matcher.group("post");
+                if (pid != null) {
+                    return Optional.of(new Link(
+                            Long.parseLong(tid),
+                            Long.parseLong(pid)));
+                } else {
+                    return Optional.of(new Link(
+                            Long.parseLong(tid),
+                            null));
+                }
+            }
         }
         @Override
         public URI boardAPI() {
@@ -46,6 +66,8 @@ public enum Board {
                     .buildAndExpand(op, number)
                     .toUri();
         }
+        static final Pattern pattern =
+                Pattern.compile("\\bhttps://boards.(4channel|4chan).org/vt/thread/(?<thread>\\d+)(?:#p(?<post>\\d+))?\\b");
     };
 
     public abstract URI boardAPI();
@@ -54,5 +76,7 @@ public enum Board {
     public abstract URI thumbnail(long id);
     public abstract URI thread(long op);
     public abstract URI post(long op, long number);
-    public abstract Pattern pattern();
+    public abstract Optional<Link> parseLink(String text);
+
+    public record Link(long thread, @Nullable Long post) {}
 }

@@ -10,10 +10,10 @@ import reactor.core.scheduler.Schedulers;
 import su.dkzde.awb.fc.CachedAccess;
 import su.dkzde.awb.fc.client.Board;
 import su.dkzde.awb.fc.client.Post;
+import su.dkzde.awb.fc.client.Thread;
 
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Optional;
 
 @Component
 public class EmbedDispatcher implements DispatchController {
@@ -28,37 +28,43 @@ public class EmbedDispatcher implements DispatchController {
     public boolean consumeMessageEvent(MessageCreateEvent event) {
         TextChannel channel = event.getChannel();
         for (Board board : Board.values()) {
-            Pattern pattern = board.pattern();
-            Matcher matcher = pattern.matcher(event.getMessageContent());
-            if (matcher.find()) {
-                String tid = matcher.group("thread");
-                String pid = matcher.group("post");
-                fcc.fetchThread(board, Long.parseLong(tid)).subscribeOn(Schedulers.boundedElastic()).subscribe(thread -> {
-                    if (pid == null) {
-                        Post post = thread.op();
-                        EmbedBuilder embed = embed(post)
-                                .setFooter(String.format("%d / %d / %d",
-                                        thread.replies(),
-                                        thread.images(),
-                                        thread.ips()));
-                        embed.setUrl(Objects.toString(thread.location()));
-                        thread.subject().ifPresentOrElse(subject -> {
-                            embed.setTitle(String.format("Thread #%d: %s", thread.number(), subject));
-                        }, () -> {
-                            embed.setTitle(String.format("Thread #%d", thread.number()));
-                        });
-                        channel.sendMessage(embed);
-                    } else thread.post(Long.parseLong(pid)).ifPresent(post -> {
-                        EmbedBuilder embed = embed(post);
-                        embed.setTitle(String.format("Reply to #%d", thread.number()));
-                        embed.setUrl(Objects.toString(post.location()));
-                        channel.sendMessage(embed);
+            Optional<Board.Link> parsed = board.parseLink(event.getMessageContent());
+            parsed.ifPresent(link -> {
+                fcc.fetchThread(board, link.thread()).subscribeOn(Schedulers.boundedElastic()).subscribe(thread -> {
+                    if (link.post() == null) {
+                        channel.sendMessage(embedOriginalPost(thread));
+                    } else thread.post(link.post()).ifPresent(post -> {
+                        channel.sendMessage(embedReply(thread, post));
                     });
                 });
-                return false;
-            }
+            });
         }
         return false;
+    }
+
+    private EmbedBuilder embedReply(Thread thread, Post post) {
+        EmbedBuilder embed = embed(post);
+        embed.setTitle(String.format("Reply to #%d", thread.number()));
+        embed.setUrl(Objects.toString(post.location()));
+        return embed;
+    }
+
+    private EmbedBuilder embedOriginalPost(Thread thread) {
+
+        EmbedBuilder embed = embed(thread.op())
+                .setFooter(String.format("%d / %d / %d",
+                        thread.replies(),
+                        thread.images(),
+                        thread.ips()));
+
+        embed.setUrl(Objects.toString(thread.location()));
+        thread.subject().ifPresentOrElse(subject -> {
+            embed.setTitle(String.format("Thread #%d: %s", thread.number(), subject));
+        }, () -> {
+            embed.setTitle(String.format("Thread #%d", thread.number()));
+        });
+
+        return embed;
     }
 
     private EmbedBuilder embed(Post post) {
