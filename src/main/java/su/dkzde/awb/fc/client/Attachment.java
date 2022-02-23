@@ -1,9 +1,13 @@
 package su.dkzde.awb.fc.client;
 
+import java.net.URI;
 import java.util.Objects;
 
 public final class Attachment {
 
+    private final Board board;
+
+    private final long id;
     private final int sizeBytes;
     private final String filename;
     private final String extension;
@@ -16,6 +20,8 @@ public final class Attachment {
     }
 
     public static final class Builder {
+        private Board board;
+        private Long id;
         private Integer sizeBytes;
         private String filename;
         private String extension;
@@ -23,6 +29,14 @@ public final class Attachment {
         private boolean spoiler = false;
         private String md5;
         private Builder() {}
+        public Builder setId(long id) {
+            this.id = id;
+            return this;
+        }
+        public Builder setBoard(Board board) {
+            this.board = board;
+            return this;
+        }
         public Builder setSizeBytes(int bytes) {
             this.sizeBytes = bytes;
             return this;
@@ -49,6 +63,8 @@ public final class Attachment {
         }
         public Attachment build() {
             return new Attachment(
+                    Objects.requireNonNull(board),
+                    Objects.requireNonNull(id),
                     Objects.requireNonNull(sizeBytes),
                     Objects.requireNonNull(filename),
                     Objects.requireNonNull(extension),
@@ -58,7 +74,17 @@ public final class Attachment {
         }
     }
 
+    public URI thumbnail() {
+        return board.thumbnail(id);
+    }
+
+    public URI location() {
+        return board.attachment(id, extension);
+    }
+
     private Attachment(
+            Board board,
+            long id,
             int sizeBytes,
             String filename,
             String extension,
@@ -66,6 +92,8 @@ public final class Attachment {
             boolean spoiler,
             String md5) {
 
+        this.board = board;
+        this.id = id;
         this.sizeBytes = sizeBytes;
         this.filename = filename;
         this.extension = extension;

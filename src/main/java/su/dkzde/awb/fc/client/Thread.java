@@ -17,6 +17,8 @@ public final class Thread {
     private final boolean sticky;
     private final boolean closed;
 
+    private final int imageCount;
+    private final int replyCount;
     private final int uniqueIps;
 
     private final boolean bumpLimitReached;
@@ -39,6 +41,8 @@ public final class Thread {
         private Boolean sticky;
         private Boolean closed;
         private Integer uniqueIps;
+        private Integer imageCount;
+        private Integer replyCount;
         private Boolean bumpLimitReached;
         private Boolean imageLimitReached;
         private @Nullable Instant archived;
@@ -67,6 +71,14 @@ public final class Thread {
         }
         public Builder setClosed(boolean closed) {
             this.closed = closed;
+            return this;
+        }
+        public Builder setImageCount(int images) {
+            this.imageCount = images;
+            return this;
+        }
+        public Builder setReplyCount(int replies) {
+            this.replyCount = replies;
             return this;
         }
         public Builder setUniqueIds(int uniqueIps) {
@@ -98,6 +110,8 @@ public final class Thread {
                     Objects.requireNonNull(op),
                     Objects.requireNonNull(sticky),
                     Objects.requireNonNull(closed),
+                    Objects.requireNonNull(imageCount),
+                    Objects.requireNonNull(replyCount),
                     Objects.requireNonNull(uniqueIps),
                     Objects.requireNonNull(bumpLimitReached),
                     Objects.requireNonNull(imageLimitReached),
@@ -115,6 +129,26 @@ public final class Thread {
         return op;
     }
 
+    public Optional<String> subject() {
+        return Optional.ofNullable(subject);
+    }
+
+    public int images() {
+        return imageCount;
+    }
+
+    public int replies() {
+        return replyCount;
+    }
+
+    public int ips() {
+        return uniqueIps;
+    }
+
+    public URI location() {
+        return board.thread(number);
+    }
+
     public Optional<Post> post(long number) {
         if (number == this.number) {
             return Optional.of(op);
@@ -130,6 +164,8 @@ public final class Thread {
             Post op,
             boolean sticky,
             boolean closed,
+            int imageCount,
+            int replyCount,
             int uniqueIps,
             boolean bumpLimitReached,
             boolean imageLimitReached,
@@ -143,6 +179,8 @@ public final class Thread {
         this.op = op;
         this.sticky = sticky;
         this.closed = closed;
+        this.replyCount = replyCount;
+        this.imageCount = imageCount;
         this.uniqueIps = uniqueIps;
         this.bumpLimitReached = bumpLimitReached;
         this.imageLimitReached = imageLimitReached;

@@ -59,6 +59,7 @@ public class Json {
          * Attachment however can be already deleted by board moderator,
          * in that case isAttachmentDeleted is set to 1.
          */
+        public @JsonProperty("tim") Long attachmentId;
         public @JsonProperty("filedeleted") Integer isAttachmentDeleted;
         public @JsonProperty("filename") String attachmentFilename;
         public @JsonProperty("ext") String attachmentExtension;

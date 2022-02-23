@@ -44,12 +44,18 @@ public class ReactiveAccessComponent implements ReactiveAccess {
             Thread.Builder builder = Thread.builder().setBoard(board);
             for (Json.Post source : json.posts) {
                 Post.Builder post = Post.builder()
+                        .setBoard(board)
+                        .setThread(op)
                         .setNumber(source.number)
-                        .setComment(source.comment)
                         .setCaption(source.caption)
                         .setPosted(Instant.ofEpochSecond(source.time));
+                if (source.comment != null) {
+                    post.setComment(Comment.create(source.comment));
+                }
                 if (source.attachmentSize != null) {
                     post.setAttachment(Attachment.builder()
+                            .setBoard(board)
+                            .setId(source.attachmentId)
                             .setSizeBytes(source.attachmentSize)
                             .setFilename(source.attachmentFilename)
                             .setExtension(source.attachmentExtension)
@@ -61,6 +67,8 @@ public class ReactiveAccessComponent implements ReactiveAccess {
                 if (Objects.equals(0, source.reply)) {
                     builder.setOp(post.build())
                             .setNumber(source.number)
+                            .setReplyCount(Objects.requireNonNullElse(source.threadReplyCount, 0))
+                            .setImageCount(Objects.requireNonNullElse(source.threadImageCount, 0))
                             .setUniqueIds(Objects.requireNonNullElse(source.uniqueIps, 0))
                             .setSticky(Objects.equals(1, source.isThreadSticky))
                             .setClosed(Objects.equals(1, source.isThreadClosed))

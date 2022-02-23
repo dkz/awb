@@ -1,9 +1,8 @@
 package su.dkzde.awb.fc.client;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.springframework.lang.Nullable;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
@@ -15,12 +14,22 @@ public final class Post {
     }
 
     public static final class Builder {
+        private Board board;
         private Long number;
+        private Long thread;
         private Instant posted;
-        private @Nullable String comment;
+        private @Nullable Comment comment;
         private @Nullable CaptionCode caption;
         private @Nullable Attachment attachment;
         private Builder() {}
+        public Builder setThread(long number) {
+            this.thread = number;
+            return this;
+        }
+        public Builder setBoard(Board board) {
+            this.board = board;
+            return this;
+        }
         public Builder setNumber(long number) {
             this.number = number;
             return this;
@@ -29,7 +38,7 @@ public final class Post {
             this.posted = posted;
             return this;
         }
-        public Builder setComment(@Nullable String comment) {
+        public Builder setComment(@Nullable Comment comment) {
             this.comment = comment;
             return this;
         }
@@ -43,6 +52,8 @@ public final class Post {
         }
         public Post build() {
             return new Post(
+                    Objects.requireNonNull(board),
+                    Objects.requireNonNull(thread),
                     Objects.requireNonNull(number),
                     Objects.requireNonNull(posted),
                     comment,
@@ -51,13 +62,13 @@ public final class Post {
         }
     }
 
+    private final Board board;
+    private final long thread;
     private final long number;
     private final Instant posted;
-    private final @Nullable String comment;
+    private final @Nullable Comment comment;
     private final @Nullable CaptionCode caption;
     private final @Nullable Attachment attachment;
-
-    private @Nullable Document document;
 
     public long number() {
         return number;
@@ -67,14 +78,8 @@ public final class Post {
         return posted;
     }
 
-    public synchronized Optional<Document> comment() {
-        if (document != null) {
-            return Optional.of(document);
-        } else if (comment != null) {
-            return Optional.of(document = Jsoup.parseBodyFragment(comment));
-        } else {
-            return Optional.empty();
-        }
+    public synchronized Optional<Comment> comment() {
+        return Optional.ofNullable(comment);
     }
 
     public Optional<CaptionCode> caption() {
@@ -85,13 +90,21 @@ public final class Post {
         return Optional.ofNullable(attachment);
     }
 
+    public URI location() {
+        return board.post(thread, number);
+    }
+
     private Post(
+            Board board,
+            long thread,
             long number,
             Instant posted,
-            @Nullable String comment,
+            @Nullable Comment comment,
             @Nullable CaptionCode caption,
             @Nullable Attachment attachment) {
 
+        this.board = board;
+        this.thread = thread;
         this.number = number;
         this.posted = posted;
         this.comment = comment;
