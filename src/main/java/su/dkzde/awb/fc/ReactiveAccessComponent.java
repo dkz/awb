@@ -7,8 +7,8 @@ import org.springframework.web.reactive.function.client.WebClient.RequestHeaders
 import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import su.dkzde.awb.fc.client.*;
 import su.dkzde.awb.fc.client.Thread;
+import su.dkzde.awb.fc.client.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class ReactiveAccessComponent implements ReactiveAccess {
                         thread.replies,
                         Instant.ofEpochSecond(thread.modifiedTs)));
             }
-            return Page.create(json.number, threads);
+            return new Page(json.number, threads);
         });
     }
 

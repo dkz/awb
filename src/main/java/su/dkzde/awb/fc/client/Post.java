@@ -1,5 +1,7 @@
 package su.dkzde.awb.fc.client;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.lang.Nullable;
 
 import java.time.Instant;
@@ -55,6 +57,8 @@ public final class Post {
     private final @Nullable CaptionCode caption;
     private final @Nullable Attachment attachment;
 
+    private @Nullable Document document;
+
     public long number() {
         return number;
     }
@@ -63,8 +67,14 @@ public final class Post {
         return posted;
     }
 
-    public Optional<String> comment() {
-        return Optional.ofNullable(comment);
+    public synchronized Optional<Document> comment() {
+        if (document != null) {
+            return Optional.of(document);
+        } else if (comment != null) {
+            return Optional.of(document = Jsoup.parseBodyFragment(comment));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public Optional<CaptionCode> caption() {

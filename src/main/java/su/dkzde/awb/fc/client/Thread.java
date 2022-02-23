@@ -87,6 +87,7 @@ public final class Thread {
         }
         public Builder addReply(Post post) {
             replies.add(post);
+            index.put(post.number(), post);
             return this;
         }
         public Thread build() {
@@ -103,6 +104,22 @@ public final class Thread {
                     archived,
                     List.copyOf(replies),
                     Map.copyOf(index));
+        }
+    }
+
+    public long number() {
+        return number;
+    }
+
+    public Post op() {
+        return op;
+    }
+
+    public Optional<Post> post(long number) {
+        if (number == this.number) {
+            return Optional.of(op);
+        } else {
+            return Optional.ofNullable(index.get(number));
         }
     }
 
