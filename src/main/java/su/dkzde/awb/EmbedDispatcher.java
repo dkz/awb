@@ -24,20 +24,25 @@ public class EmbedDispatcher implements DispatchController {
     @Autowired
     private CachedAccess fcc;
 
+    @Autowired
+    private Permissions permissions;
+
     @Override
     public boolean consumeMessageEvent(MessageCreateEvent event) {
         TextChannel channel = event.getChannel();
         for (Board board : Board.values()) {
-            Optional<Board.Link> parsed = board.parseLink(event.getMessageContent());
-            parsed.ifPresent(link -> {
-                fcc.fetchThread(board, link.thread()).subscribeOn(Schedulers.boundedElastic()).subscribe(thread -> {
-                    if (link.post() == null) {
-                        channel.sendMessage(embedOriginalPost(thread));
-                    } else thread.post(link.post()).ifPresent(post -> {
-                        channel.sendMessage(embedReply(thread, post));
+            if (permissions.embedsPermitted(channel.getIdAsString(), board)) {
+                Optional<Board.Link> parsed = board.parseLink(event.getMessageContent());
+                parsed.ifPresent(link -> {
+                    fcc.fetchThread(board, link.thread()).subscribeOn(Schedulers.boundedElastic()).subscribe(thread -> {
+                        if (link.post() == null) {
+                            channel.sendMessage(embedOriginalPost(thread));
+                        } else thread.post(link.post()).ifPresent(post -> {
+                            channel.sendMessage(embedReply(thread, post));
+                        });
                     });
                 });
-            });
+            }
         }
         return false;
     }
