@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @EnableScheduling
@@ -34,6 +35,9 @@ public class AwbApplication {
 
     @Bean
     public WebClient web() {
-        return WebClient.create();
+        return WebClient.builder()
+                .exchangeStrategies(ExchangeStrategies.builder()
+                        .codecs(conf -> conf.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
+                        .build()).build();
     }
 }

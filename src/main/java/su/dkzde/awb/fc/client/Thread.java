@@ -121,6 +121,10 @@ public final class Thread {
         }
     }
 
+    public Board board() {
+        return board;
+    }
+
     public long number() {
         return number;
     }
@@ -155,6 +159,12 @@ public final class Thread {
         } else {
             return Optional.ofNullable(index.get(number));
         }
+    }
+
+    public LinkedList<Post> listPosts() {
+        LinkedList<Post> posts = new LinkedList<>(replies);
+        posts.addFirst(op);
+        return posts;
     }
 
     private Thread(

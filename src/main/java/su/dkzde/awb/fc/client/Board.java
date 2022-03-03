@@ -66,6 +66,10 @@ public enum Board {
                     .buildAndExpand(op, number)
                     .toUri();
         }
+        @Override
+        public String toString() {
+            return "/vt/";
+        }
         static final Pattern pattern =
                 Pattern.compile("\\bhttps://boards.(4channel|4chan).org/vt/thread/(?<thread>\\d+)(?:#p(?<post>\\d+))?\\b");
     };
