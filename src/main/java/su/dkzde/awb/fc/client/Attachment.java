@@ -74,6 +74,14 @@ public final class Attachment {
         }
     }
 
+    public String filename() {
+        return filename;
+    }
+
+    public String extension() {
+        return extension;
+    }
+
     public URI thumbnail() {
         return board.thumbnail(id);
     }

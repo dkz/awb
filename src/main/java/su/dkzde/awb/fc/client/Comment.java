@@ -9,8 +9,8 @@ import org.jsoup.select.Elements;
 import org.jsoup.select.NodeTraversor;
 import org.jsoup.select.NodeVisitor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,8 +31,8 @@ public final class Comment {
         return target.toString();
     }
 
-    public List<Long> quotes() {
-        ArrayList<Long> references = new ArrayList<>();
+    public Collection<Long> quotes() {
+        HashSet<Long> references = new HashSet<>(64);
         Elements quotes = document.select(".quotelink");
         for (Element element : quotes) {
             String link = element.attr("href");

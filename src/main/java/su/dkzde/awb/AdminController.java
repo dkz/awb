@@ -76,6 +76,12 @@ public class AdminController implements DispatchController {
         String command = args.pollFirst();
         TextChannel channel = event.getChannel();
         if (command != null) switch (command) {
+            case "enable-image-embeds" -> {
+                permissions.setPopularPostsImageEmbeds(channel.getIdAsString(), Board.vt, true);
+            }
+            case "disable-image-embeds" -> {
+                permissions.setPopularPostsImageEmbeds(channel.getIdAsString(), Board.vt, false);
+            }
             case "enable" -> {
                 String threshold = args.pollFirst();
                 if (threshold != null) try {

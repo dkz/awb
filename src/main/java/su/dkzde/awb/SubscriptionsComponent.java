@@ -39,6 +39,9 @@ public class SubscriptionsComponent implements Subscriptions {
     private CachedAccess fcc;
 
     @Autowired
+    private Permissions permissions;
+
+    @Autowired
     private ObjectMapper mapper;
 
     @PostConstruct
@@ -67,7 +70,7 @@ public class SubscriptionsComponent implements Subscriptions {
                 if (config.popularPosts) {
                     if (config.popularPostThreshold <= quotesTotal && config.popularPostThreshold > quotesTotal - quotesNew) {
                         api.getTextChannelById(channel).ifPresent(ch -> {
-                            ch.sendMessage(popularPost(thread, post, quotesTotal));
+                            ch.sendMessage(popularPost(channel, thread, post, quotesTotal));
                         });
                     }
                 }
@@ -75,10 +78,14 @@ public class SubscriptionsComponent implements Subscriptions {
         }
     };
 
-    private EmbedBuilder popularPost(Thread thread, Post post, int quotes) {
+    private EmbedBuilder popularPost(String channel, Thread thread, Post post, int quotes) {
         EmbedBuilder embed = new EmbedBuilder().setTimestamp(post.posted());
         post.attachment().ifPresent(attachment -> {
-            embed.setThumbnail(Objects.toString(attachment.location()));
+            if (permissions.popularPostsImageEmbeds(channel, thread.board())) {
+                embed.setImage(Objects.toString(attachment.location()));
+            } else {
+                embed.setThumbnail(Objects.toString(attachment.location()));
+            }
         });
         post.comment().ifPresent(comment -> {
             embed.setDescription(comment.text());

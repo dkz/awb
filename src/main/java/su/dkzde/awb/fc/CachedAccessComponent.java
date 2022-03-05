@@ -97,7 +97,7 @@ public class CachedAccessComponent implements CachedAccess {
         });
     }
 
-    @Scheduled(cron = "* */15 * * * *")
+    @Scheduled(cron = "0 * * * * *")
     private void updateTrigger() {
         for (Board board : Board.values()) {
             BoardCache cache = caches.get(board);

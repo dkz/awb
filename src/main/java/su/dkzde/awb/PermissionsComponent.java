@@ -29,7 +29,8 @@ public class PermissionsComponent implements Permissions {
     private ObjectMapper mapper;
 
     private enum PermissionType {
-        channel_embeds
+        channel_embeds,
+        popular_posts_image_embeds
     }
 
     private record Permission(String channel, Board board, PermissionType permission) {}
@@ -46,6 +47,18 @@ public class PermissionsComponent implements Permissions {
     @Override
     public void setEmbedsPermitted(String channel, Board board, boolean permitted) {
         permissions.put(new Permission(channel, board, PermissionType.channel_embeds), permitted);
+        export();
+    }
+
+    @Override
+    public boolean popularPostsImageEmbeds(String channel, Board board) {
+        return Boolean.TRUE.equals(
+                permissions.get(new Permission(channel, board, PermissionType.popular_posts_image_embeds)));
+    }
+
+    @Override
+    public void setPopularPostsImageEmbeds(String channel, Board board, boolean permitted) {
+        permissions.put(new Permission(channel, board, PermissionType.popular_posts_image_embeds), permitted);
         export();
     }
 
